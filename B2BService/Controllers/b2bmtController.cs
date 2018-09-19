@@ -117,13 +117,16 @@ namespace B2BService.Controllers
             IList<string> isasenderids = vmtrefdbList.OrderBy(x => x.ISASENDERID).Select(x => x.ISASENDERID.ToUpper().Trim()).Distinct().ToList();
             IList<string> isareceiverids = vmtrefdbList.OrderBy(x => x.ISARECEIVERID).Select(x => x.ISARECEIVERID.ToUpper().Trim()).Distinct().ToList();
             IList<string> gssenderids = vmtrefdbList.OrderBy(x => x.GSSENDERID).Select(x => x.GSSENDERID.ToUpper().Trim()).Distinct().ToList();
-            
+            IList<string> edimsgtypes = vmtrefdbList.OrderBy(x => x.EDIMSGTYPE).Select(x => x.EDIMSGTYPE.ToUpper().Trim()).Distinct().ToList();
+
+
             ViewData["Partners"] = partners;
             ViewData["Divisions"] = divisions;
             ViewData["Regions"] = regions;
             ViewData["ISASenderIds"] = isasenderids;
             ViewData["ISAReceiverIds"] = isareceiverids;
             ViewData["GSSenderIds"] = gssenderids;
+            ViewData["EDIMsgTypes"] = edimsgtypes;
         }
 
         public ActionResult ProcessDB(string Id, string piServer)
