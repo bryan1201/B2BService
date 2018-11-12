@@ -82,9 +82,12 @@ namespace B2BService.Controllers
             mtdb.KEYWORD_SEARCH = (string.IsNullOrEmpty(keyWordSearch)) ? string.Empty : keyWordSearch.Trim();
             mtdb.SetCreateDateFrom(cdtFrom);
             mtdb.SetCreateDateEnd(cdtEnd);
+
             piServer = string.IsNullOrEmpty(piServer) ? Constant.PIPServer : piServer;
             IMTDBCollection imtdbcollection = DataAccess.CreateMTDBCollection(piServer);
             IEnumerable<MT_DB> result = imtdbcollection.Get(mtdb);
+            ViewBag.cdtFrom = mtdb.GetCreateDateFrom();
+            ViewBag.cdtEnd = mtdb.GetCreateDateEnd();
             ViewBag.piServer = piServer;
             ViewBag.SqlString = imtdbcollection.GetSqlString();
             InitDLL((mtdb.STATUS.HasValue)?mtdb.STATUS.Value.ToString():"");

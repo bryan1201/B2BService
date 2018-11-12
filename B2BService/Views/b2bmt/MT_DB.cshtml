@@ -3,6 +3,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string parentMessageId = string.Empty;
     string piServer = ViewBag.piServer;
+    DateTime? cdtFrom = (ViewBag.cdtFrom != null) ? (DateTime)ViewBag.cdtFrom : DateTime.Now.AddMonths(-1);
+    DateTime ? cdtEnd = (ViewBag.cdtEnd != null)? (DateTime?)ViewBag.cdtEnd: DateTime.Now;
+    
+    string CdtFrom = cdtFrom.Value.ToString("yyyy/MM/dd hh:mm:ss");
+    string CdtEnd = cdtEnd.Value.ToString("yyyy/MM/dd hh:mm:ss");
     string SqlString = string.IsNullOrEmpty(ViewBag.SqlString) ? string.Empty : ViewBag.SqlString;
 
     IList<string> Partners = (IList<string>)ViewData["Partners"];
@@ -211,7 +216,7 @@
                                             <tr>
                                                 <td>
                                                     <div class='input-group date' id='datetimepicker6'>
-                                                        @Html.TextBox("CdtFrom", "", new { @class = "form-control" })
+                                                        @Html.TextBox("CdtFrom", CdtFrom, new { @class = "form-control" })
                                                         <span class="input-group-addon">
                                                             <span class="glyphicon glyphicon-calendar"></span>
                                                         </span>
@@ -221,7 +226,7 @@
                                             <tr>
                                                 <td>
                                                     <div class='input-group date' id='datetimepicker7'>
-                                                        @Html.TextBox("CdtEnd", "", new { @class = "form-control" })
+                                                        @Html.TextBox("CdtEnd", CdtEnd, new { @class = "form-control" })
                                                         <span class="input-group-addon">
                                                             <span class="glyphicon glyphicon-calendar"></span>
                                                         </span>

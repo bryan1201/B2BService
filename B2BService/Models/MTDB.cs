@@ -48,11 +48,13 @@ namespace B2BService.Models
         private DateTime? _CreateDateEnd { get; set; }
         public void SetCreateDateFrom(DateTime? dt)
         {
+       
             this._CreateDateFrom = dt;
         }
 
         public void SetCreateDateEnd(DateTime? dt)
         {
+            
             this._CreateDateEnd = dt; //DateTime.Parse(DateTime.Now.ToString("yyyy/MM/dd 23:59:59"));
         }
 

@@ -16,6 +16,13 @@ namespace B2BService.Controllers
             return View();
         }
 
+        public ActionResult Help()
+        {
+            ViewBag.Message = "Help";
+
+            return View();
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
