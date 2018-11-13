@@ -73,6 +73,7 @@ namespace B2BService.Models
                 cmd.CommandText = sql;
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandTimeout = 1800;
+                cmd.FetchSize = cmd.ExecuteReader().RowSize * 2000;
                 adapter = new OracleDataAdapter(cmd);
                 adapter.Fill(ds);
             }
