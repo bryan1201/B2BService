@@ -64,10 +64,13 @@ namespace B2BService.Models
 
         public object GetDIVISION(ServiceType Type, string partner)
         {
+            string[] delimiterChars = { "\n" };
+            string[] divArray = partner.Split(delimiterChars, StringSplitOptions.None);
+            partner = string.IsNullOrEmpty(partner) ? "" : partner;
             HttpResponseMessage result;
             IEnumerable<string> resultdb =
                 (from mt in QUERYREFDB()
-                 where mt.PARTNER == partner.ToUpper().Trim()
+                 where divArray.Contains(mt.PARTNER)
                  orderby mt.DIVISION
                  select new { DIVISION = mt.DIVISION.Trim().ToUpper() })
                  .Select(x => x.DIVISION).Distinct();

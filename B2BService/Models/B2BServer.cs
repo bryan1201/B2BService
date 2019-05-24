@@ -381,6 +381,7 @@ namespace B2BService.Models
             }
             catch
             {
+                return new List<string>();
                 throw new NotImplementedException();
             }
         }

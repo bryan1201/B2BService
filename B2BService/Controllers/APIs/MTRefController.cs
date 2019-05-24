@@ -15,9 +15,19 @@ namespace B2BService.Controllers.APIs
     {
         // GET api/<controller>
         private ServiceType _type = ServiceType.Json;
-        public IEnumerable<string> Get()
+        public HttpResponseMessage Get()
         {
-            return new string[] { "value1", "value2" };
+            var array = new string[] {
+                DateTime.Now.ToShortDateString(),
+                DateTime.Now.ToShortTimeString()
+            };
+
+            string json = JsonConvert.SerializeObject(array, Formatting.Indented);
+
+            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            result.Content = new StringContent(json);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return result;
         }
 
         // GET api/<controller>/5
@@ -50,6 +60,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
+        //http://iec1-b2bapp.iec.inventec/B2BService2/api/MTREF/GetPartners?optradio=PIQServer
         public HttpResponseMessage GetPartners(string optradio)
         {
             //http://localhost:52010/B2BService/api/MTRef/GetPartners?optradio=PIQServer
@@ -59,9 +70,9 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
+        //http://localhost:52010/B2BService/api/MTRef/GetDivisions?partner=DELL&optradio=PIQServer
         public HttpResponseMessage GetDivisions(string partner, string optradio)
         {
-            //http://localhost:52010/B2BService/api/MTRef/GetDivisions?partner=DELL&optradio=PIQServer
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> divisions = ((IEnumerable<string>)imtref.GetDIVISION(_type, partner)).ToList();
             var result = retRspMsg(divisions);

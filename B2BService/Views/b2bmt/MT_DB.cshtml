@@ -1,11 +1,12 @@
 ﻿@model IEnumerable<B2BService.Models.VMTDB>
+@using B2BService.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     string parentMessageId = string.Empty;
     string piServer = ViewBag.piServer;
     DateTime? cdtFrom = (ViewBag.cdtFrom != null) ? (DateTime)ViewBag.cdtFrom : DateTime.Now.AddMonths(-1);
     DateTime ? cdtEnd = (ViewBag.cdtEnd != null)? (DateTime?)ViewBag.cdtEnd: DateTime.Now;
-    
+
     string CdtFrom = cdtFrom.Value.ToString("yyyy/MM/dd hh:mm:ss");
     string CdtEnd = cdtEnd.Value.ToString("yyyy/MM/dd hh:mm:ss");
     string SqlString = string.IsNullOrEmpty(ViewBag.SqlString) ? string.Empty : ViewBag.SqlString;
@@ -17,35 +18,22 @@
     IList<string> ISAReceiverIDs = (IList<string>)ViewData["ISAReceiverIds"];
     IList<string> GSSenderIDs = (IList<string>)ViewData["GSSenderIds"];
     IList<string> EDIMsgTypes = (IList<string>)ViewData["EDIMsgTypes"];
+    string website = @"/B2BService/";
+    string web = website + "api/MTRef/";
 }
 <script type="text/javascript">
+    var optionsPartner = [];
+    var optionsDivision = [];
+    var optionsRegion = [];
+    var optionsISASenderID = [];
+    var optionsISAReceiverID = [];
+    var optionsGSSenderID = [];
+    var optionsEDIMsgType = [];
+    var optionsDirection = [];
 
-    $(function () {
-
-        $('#datetimepicker6').datetimepicker({
-            format: 'YYYY/MM/DD HH:mm:ss'
-        });
-        $('#datetimepicker7').datetimepicker({
-            useCurrent: false, //Important! See issue #1075
-            format: 'YYYY/MM/DD HH:mm:ss'
-        });
-        $("#datetimepicker6").on("dp.change", function (e) {
-            $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
-        });
-        $("#datetimepicker7").on("dp.change", function (e) {
-            $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
-        });
-
-        var optionsPartner = [];
-        var optionsDivision = [];
-        var optionsRegion = [];
-        var optionsISASenderID = [];
-        var optionsISAReceiverID = [];
-        var optionsGSSenderID = [];
-        var optionsEDIMsgType = [];
-        var optionsDirection = [];
-        $('.dropdown-menu a').on('click', function (event) {
-
+    var RrefreshBinding = function () {
+        $('.dropdown-menu li a').on('click', function (event) {
+            console.log("ul li a input checkbox selected 01!");
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),
@@ -53,38 +41,31 @@
                 ItemName = $target.attr('name'),
                 ItemId,
                 options = [];
+            ItemId = $('.button-group #' + ItemName);
 
             switch (ItemName) {
                 case 'PARTNER':
-                    ItemId = $(".button-group #PARTNER");
                     options = optionsPartner;
                     break;
                 case 'DIVISION':
-                    ItemId = $(".button-group #DIVISION");
                     options = optionsDivision;
                     break;
                 case 'REGION':
-                    ItemId = $(".button-group #REGION");
                     options = optionsRegion;
                     break;
                 case 'ISASENDERID':
-                    ItemId = $(".button-group #ISASENDERID");
                     options = optionsISASenderID;
                     break;
                 case 'ISARECEIVERID':
-                    ItemId = $(".button-group #ISARECEIVERID");
                     options = optionsISAReceiverID;
                     break;
                 case 'GSSENDERID':
-                    ItemId = $(".button-group #GSSENDERID");
                     options = optionsGSSenderID;
                     break;
                 case 'EDIMSGTYPE':
-                    ItemId = $(".button-group #EDIMSGTYPE");
                     options = optionsEDIMsgType;
                     break;
                 case 'DIRECTION':
-                    ItemId = $(".button-group #DIRECTION");
                     options = optionsDirection;
                     break;
             }
@@ -128,7 +109,138 @@
                     optionsDirection = options;
                     break;
             }
+        });
+    }
 
+    $(function () {
+        $('#datetimepicker6').datetimepicker({
+            format: 'YYYY/MM/DD HH:mm:ss'
+        });
+        $('#datetimepicker7').datetimepicker({
+            useCurrent: false, //Important! See issue #1075
+            format: 'YYYY/MM/DD HH:mm:ss'
+        });
+        $("#datetimepicker6").on("dp.change", function (e) {
+            $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+        });
+        $("#datetimepicker7").on("dp.change", function (e) {
+            $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+        });
+
+        $('.dropdown-menu li a').on('click', function (event) {
+            console.log("ul li a input checkbox selected 01!");
+            var $target = $(event.currentTarget),
+                val = $target.attr('data-value'),
+                $inp = $target.find('input'),
+                idx,
+                ItemName = $target.attr('name'),
+                ItemId,
+                options = [];
+            ItemId = $(".button-group #" + ItemName);
+            switch (ItemName) {
+                case 'PARTNER':
+                    options = optionsPartner;
+                    break;
+                case 'DIVISION':
+                    options = optionsDivision;
+                    break;
+                case 'REGION':
+                    options = optionsRegion;
+                    break;
+                case 'ISASENDERID':
+                    options = optionsISASenderID;
+                    break;
+                case 'ISARECEIVERID':
+                    options = optionsISAReceiverID;
+                    break;
+                case 'GSSENDERID':
+                    options = optionsGSSenderID;
+                    break;
+                case 'EDIMSGTYPE':
+                    options = optionsEDIMsgType;
+                    break;
+                case 'DIRECTION':
+                    options = optionsDirection;
+                    break;
+            }
+
+            if ((idx = options.indexOf(val)) > -1) {
+                options.splice(idx, 1);
+                setTimeout(function () { $inp.prop('checked', false) }, 0);
+            } else {
+                options.push(val);
+                setTimeout(function () { $inp.prop('checked', true) }, 0);
+            }
+
+            ItemId.val('');
+            options.forEach(function (element) {
+                ItemId.val(ItemId.val() + element + '\r\n');
+            });
+
+            switch (ItemName) {
+                case 'PARTNER':
+                    optionsPartner = options;
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        url: "@web" + "GetDIvisions",
+                        data: { partner: ItemId.val(), optradio: "PIQServer" },
+                        success: function (data) {
+                            var ItemId2 = $(".button-group #ulDIVISION");
+                            ItemId2.html('');
+                            ItemId2.addClass('dropdown-menu');
+                            ItemId2.attr('name', 'ulDIVISION');
+                            ItemId2.attr('id', 'ulDIVISION');
+                            $.each(data, function (i, item) {
+                                var li = $('<li/>')
+                                    .appendTo('#ulDIVISION');
+                                var a = $('<a />').appendTo(li);
+                                a.addClass('small').attr('href', '#');
+                                a.attr('id', 'DIVISION');
+                                a.attr('name', 'DIVISION');
+                                a.attr('data-value', item);
+                                a.attr('tabIndex', -1);
+                                
+                                var input = $('<input />');
+                                input.attr('type', 'checkbox');
+                                input.appendTo(a);
+                                input.after('&nbsp;' + item);
+                                a.appendTo(li);
+                            });
+                            RrefreshBinding();
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            return false;
+                            alert('Failed to retrieve test item menu.');
+                        }
+
+                    });
+                    
+                    break;
+                case 'DIVISION':
+                    optionsDivision = options;
+                    break;
+                case 'REGION':
+                    optionsRegion = options;
+                    break;
+                case 'ISASENDERID':
+                    optionsISASenderID = options;
+                    break;
+                case 'ISARECEIVERID':
+                    optionsISAReceiverID = options;
+                    break;
+                case 'GSSENDERID':
+                    optionsGSSenderID = options;
+                    break;
+                case 'EDIMSGTYPE':
+                    optionsEDIMsgType = options;
+                    break;
+                case 'DIRECTION':
+                    optionsDirection = options;
+                    break;
+            }
+
+            
             $(event.target).blur();
 
             console.log(options);
