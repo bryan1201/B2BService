@@ -30,10 +30,44 @@
     var optionsGSSenderID = [];
     var optionsEDIMsgType = [];
     var optionsDirection = [];
+    var irefresh = 0;
+    var icounter = 0;
+
+    function checkBoxinspect(ItemId, val, idx, $inp, options) {
+        icounter = icounter + 1;
+
+        if ((idx = options.indexOf(val)) > -1) {
+            options.splice(idx, 1);
+            setTimeout(function () { $inp.prop('checked', false) }, 1);
+            console.log(ItemId + " false " + icounter);
+        } else {
+            options.push(val);
+            setTimeout(function () { $inp.prop('checked', true) }, 1);
+
+            console.log(ItemId + " true " + icounter);
+        }
+
+        ItemId.val('');
+        options.forEach(function (element) {
+            ItemId.val(ItemId.val() + element + '\r\n');
+        });
+
+        irefresh = irefresh + 1;
+        return false;
+    }
 
     var RrefreshBinding = function () {
         $('.dropdown-menu li a').on('click', function (event) {
-            console.log("ul li a input checkbox selected 01!");
+
+            if (irefresh > 1) {
+                irefresh = 0;
+                //setTimeout(function () { alert("RefreshBinding" + irefresh); }, 1);
+                return false;
+            }
+            else {
+                setTimeout(function () { irefresh = irefresh + 1; return true;}, 5);
+            }
+
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),
@@ -41,8 +75,8 @@
                 ItemName = $target.attr('name'),
                 ItemId,
                 options = [];
-            ItemId = $('.button-group #' + ItemName);
-
+            ItemId = $('.button-group #ul' + ItemName);
+            //alert(ItemName);
             switch (ItemName) {
                 case 'PARTNER':
                     options = optionsPartner;
@@ -70,47 +104,186 @@
                     break;
             }
 
-            if ((idx = options.indexOf(val)) > -1) {
-                options.splice(idx, 1);
-                setTimeout(function () { $inp.prop('checked', false) }, 0);
-            } else {
-                options.push(val);
-                setTimeout(function () { $inp.prop('checked', true) }, 0);
-            }
-
-            ItemId.val('');
-            options.forEach(function (element) {
-                ItemId.val(ItemId.val() + element + '\r\n');
-            });
+            area = $('#area' + ItemName);
+            area.val('');
 
             switch (ItemName) {
                 case 'PARTNER':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsPartner = options;
+                    area = optionsPartner.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    GetDIVISION('DIVISION', optionsPartner);
                     break;
                 case 'DIVISION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsDivision = options;
+                    area = optionsDivision.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    GetREGION('REGION', optionsPartner, optionsDivision);
                     break;
                 case 'REGION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsRegion = options;
+                    area = optionsRegion.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    GetOthersID('ISASENDERID', optionsPartner, optionsDivision, optionsRegion);
+                    GetOthersID('ISASENDERID', optionsPartner, optionsDivision, optionsRegion);
+                    GetOthersID('ISARECEIVERID', optionsPartner, optionsDivision, optionsRegion);
+                    GetOthersID('GSSENDERID', optionsPartner, optionsDivision, optionsRegion);
+                    GetOthersID('EDIMSGTYPE', optionsPartner, optionsDivision, optionsRegion);
+                    
                     break;
                 case 'ISASENDERID':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsISASenderID = options;
+                    area = optionsISASenderID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    
                     break;
                 case 'ISARECEIVERID':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsISAReceiverID = options;
+                    area = optionsISAReceiverID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    
                     break;
                 case 'GSSENDERID':
+                    //alert(ItemName);
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsGSSenderID = options;
+                    area = optionsGSSenderID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    
                     break;
                 case 'EDIMSGTYPE':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsEDIMsgType = options;
+                    area = optionsEDIMsgType.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'DIRECTION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsDirection = options;
+                    area = optionsDirection.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
             }
+            return false;
         });
+        return false;
     }
+
+	function GetDIVISION(itemName, itemId)
+	{
+		var DIVISION = "DIVISION";
+		$.ajax({
+			cache: false,
+			type: "GET",
+			url: "@web" + "Get" + itemName,
+			data: { partner: itemId, optradio: "PIQServer" },
+			success: function (data) {
+                var ItemId2 = $('.button-group #ul' + itemName);
+				ItemId2.html('');
+				ItemId2.addClass('dropdown-menu');
+				ItemId2.attr('name', 'ul' + itemName);
+				ItemId2.attr('id', 'ul' + itemName);
+				$.each(data, function (i, item) {
+					var li = $('<li/>').appendTo('#ul' + itemName);
+					var a = $('<a />').appendTo(li);
+					a.addClass('small').attr('href', '#');
+					a.attr('id', itemName);
+					a.attr('name', itemName);
+					a.attr('data-value', item);
+					a.attr('tabIndex', -1);
+					
+					var input = $('<input />');
+					input.attr('type', 'checkbox');
+					input.appendTo(a);
+					input.after('&nbsp;' + item);
+					a.appendTo(li);
+                });
+                //alert("DIVISION before RrefreshBinding" + irefresh);
+                RrefreshBinding();
+                //alert("DIVISION after RrefreshBinding" + irefresh);
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				return false;
+				alert('Failed to retrieve test item menu.');
+			}
+		});
+		return true;
+    }
+
+    function GetREGION(itemName, partnerId, divisionId)
+    {
+        //alert(partnerId);
+		$.ajax({
+			cache: false,
+			type: "GET",
+			url: "@web" + "Get" + itemName,
+			data: { partner: partnerId, division: divisionId, optradio: "PIQServer" },
+			success: function (data) {
+                var ItemId2 = $('.button-group #ul' + itemName);
+				ItemId2.html('');
+				ItemId2.addClass('dropdown-menu');
+				ItemId2.attr('name', 'ul' + itemName);
+				ItemId2.attr('id', 'ul' + itemName);
+				$.each(data, function (i, item) {
+					var li = $('<li/>').appendTo('#ul' + itemName);
+					var a = $('<a />').appendTo(li);
+					a.addClass('small').attr('href', '#');
+					a.attr('id', itemName);
+					a.attr('name', itemName);
+					a.attr('data-value', item);
+					a.attr('tabIndex', -1);
+					
+					var input = $('<input />');
+					input.attr('type', 'checkbox');
+					input.appendTo(a);
+					input.after('&nbsp;' + item);
+					a.appendTo(li);
+				});
+                RrefreshBinding();
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				return false;
+				alert('Failed to retrieve test item menu.');
+			}
+		});
+		return true;
+    }
+
+    function GetOthersID(itemName, partnerId, divisionId, regionId)
+    {
+        //alert(partnerId);
+		$.ajax({
+			cache: false,
+			type: "GET",
+			url: "@web" + "Get" + itemName,
+			data: { partner: partnerId, division: divisionId, region:regionId, optradio: "PIQServer" },
+			success: function (data) {
+                var ItemId2 = $('.button-group #ul' + itemName);
+				ItemId2.html('');
+				ItemId2.addClass('dropdown-menu');
+				ItemId2.attr('name', 'ul' + itemName);
+				ItemId2.attr('id', 'ul' + itemName);
+				$.each(data, function (i, item) {
+					var li = $('<li/>').appendTo('#ul' + itemName);
+					var a = $('<a />').appendTo(li);
+					a.addClass('small').attr('href', '#');
+					a.attr('id', itemName);
+					a.attr('name', itemName);
+					a.attr('data-value', item);
+					a.attr('tabIndex', -1);
+					
+					var input = $('<input />');
+					input.attr('type', 'checkbox');
+					input.appendTo(a);
+					input.after('&nbsp;' + item);
+					a.appendTo(li);
+				});
+                RrefreshBinding();
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				return false;
+				alert('Failed to retrieve test item menu.');
+			}
+		});
+		return true;
+	}
 
     $(function () {
         $('#datetimepicker6').datetimepicker({
@@ -128,7 +301,7 @@
         });
 
         $('.dropdown-menu li a').on('click', function (event) {
-            console.log("ul li a input checkbox selected 01!");
+
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),
@@ -136,7 +309,10 @@
                 ItemName = $target.attr('name'),
                 ItemId,
                 options = [];
-            ItemId = $(".button-group #" + ItemName);
+
+            alert(".dropdown-menu li a " + ItemName + " on click");
+
+            ItemId = $(".button-group #ul" + ItemName);
             switch (ItemName) {
                 case 'PARTNER':
                     options = optionsPartner;
@@ -163,87 +339,57 @@
                     options = optionsDirection;
                     break;
             }
-
-            if ((idx = options.indexOf(val)) > -1) {
-                options.splice(idx, 1);
-                setTimeout(function () { $inp.prop('checked', false) }, 0);
-            } else {
-                options.push(val);
-                setTimeout(function () { $inp.prop('checked', true) }, 0);
-            }
-
-            ItemId.val('');
-            options.forEach(function (element) {
-                ItemId.val(ItemId.val() + element + '\r\n');
-            });
+            area = $('#area' + ItemName);
+            area.val('');
 
             switch (ItemName) {
                 case 'PARTNER':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsPartner = options;
-                    $.ajax({
-                        cache: false,
-                        type: "GET",
-                        url: "@web" + "GetDIvisions",
-                        data: { partner: ItemId.val(), optradio: "PIQServer" },
-                        success: function (data) {
-                            var ItemId2 = $(".button-group #ulDIVISION");
-                            ItemId2.html('');
-                            ItemId2.addClass('dropdown-menu');
-                            ItemId2.attr('name', 'ulDIVISION');
-                            ItemId2.attr('id', 'ulDIVISION');
-                            $.each(data, function (i, item) {
-                                var li = $('<li/>')
-                                    .appendTo('#ulDIVISION');
-                                var a = $('<a />').appendTo(li);
-                                a.addClass('small').attr('href', '#');
-                                a.attr('id', 'DIVISION');
-                                a.attr('name', 'DIVISION');
-                                a.attr('data-value', item);
-                                a.attr('tabIndex', -1);
-                                
-                                var input = $('<input />');
-                                input.attr('type', 'checkbox');
-                                input.appendTo(a);
-                                input.after('&nbsp;' + item);
-                                a.appendTo(li);
-                            });
-                            RrefreshBinding();
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            return false;
-                            alert('Failed to retrieve test item menu.');
-                        }
-
-                    });
-                    
+                    area = optionsPartner.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    GetDIVISION('DIVISION', optionsPartner);
                     break;
                 case 'DIVISION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsDivision = options;
+                    area = optionsDivision.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
+                    GetREGION('REGION', optionsPartner, optionsDivision);
                     break;
                 case 'REGION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsRegion = options;
+                    area = optionsRegion.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'ISASENDERID':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsISASenderID = options;
+                    area = optionsISASenderID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'ISARECEIVERID':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsISAReceiverID = options;
+                    area = optionsISAReceiverID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'GSSENDERID':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsGSSenderID = options;
+                    area = optionsGSSenderID.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'EDIMSGTYPE':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsEDIMsgType = options;
+                    area = optionsEDIMsgType.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
                 case 'DIRECTION':
+                    checkBoxinspect(ItemId, val, idx, $inp, options);
                     optionsDirection = options;
+                    area = optionsDirection.forEach(function (ele) { area.val(area.val() + ele + '\r\n') });
                     break;
             }
-
-            
             $(event.target).blur();
-
             console.log(options);
+            irefresh = irefresh + 1;
+            //alert("first: " + irefresh);
             return false;
         });
     });
@@ -252,7 +398,7 @@
         var ItemId = $(this).data('id');
         $(".modal-title #ItemId").val(ItemId);
         ItemId = $(".modal-title #ItemId");
-        $(".modal-body #ItemContent").val($("#" + ItemId.val()).val());
+        $(".modal-body #ItemContent").val($("#area" + ItemId.val()).val());
         // As pointed out in comments,
         // it is superfluous to have to manually call the modal.
         // $('#addBookDialog').modal('show');
@@ -272,9 +418,6 @@
         var ItemId = $(".modal-title #ItemId");
         $("#" + ItemId.val()).val($(".modal-body #ItemContent").val());
     }
-
-
-
 </script>
 <table class="table table-condensed" style="width:100%">
     <tr>
@@ -357,7 +500,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <table class="table table-bordered table-striped table-condensed">
+                            <table class="table table-bordered table-striped table-condensed" id="tblMT">
                                 <tr>
                                     <th>PARTNER</th>
                                     <th>DIVISION</th>
@@ -366,12 +509,12 @@
                                     <th>ISARECEIVERID</th>
                                     <th>GSSENDERID</th>
                                 </tr>
-                                <tr>
+                                <tr id="secondrow">
                                     <td>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("PARTNER", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaPARTNER", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
@@ -393,7 +536,7 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("DIVISION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaDIVISION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
@@ -415,7 +558,7 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("REGION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaREGION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
@@ -437,11 +580,11 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("ISASENDERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaISASENDERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
-                                                        <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu" id="ulISASENDERID" name="ulISASENDERID">
                                                             @foreach (var item in ISASenderIDs)
                                                             {
                                                                 <li>
@@ -459,11 +602,11 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("ISARECEIVERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaISARECEIVERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
-                                                        <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu" id="ulISARECEIVERID" name="ulISARECEIVERID" >
                                                             @foreach (var item in ISAReceiverIDs)
                                                             {
                                                                 <li>
@@ -481,11 +624,11 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("GSSENDERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaGSSENDERID", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
-                                                        <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu" id="ulGSSENDERID", name="ulGSSENDERID">
                                                             @foreach (var item in GSSenderIDs)
                                                             {
                                                                 <li>
@@ -526,11 +669,11 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("EDIMSGTYPE", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaEDIMSGTYPE", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
-                                                        <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu" id="ulEDIMSGTYPE">
                                                             @foreach (var item in EDIMsgTypes)
                                                             {
                                                                 <li>
@@ -548,11 +691,11 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="button-group">
-                                                    @Html.TextArea("DIRECTION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
+                                                    @Html.TextArea("areaDIRECTION", "", new { @class = "form-control", @rows = 1, style = "resize: none;" })
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <span class="caret"></span></button>
 
-                                                        <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu" id="ulDIRECTION">
                                                             <li>
                                                                 <a href="#" name="DIRECTION" class="small" data-value="1" tabIndex="-1"><input type="checkbox" />&nbsp;1</a>
                                                             </li>

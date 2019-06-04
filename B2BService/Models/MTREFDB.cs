@@ -97,6 +97,9 @@ namespace B2BService.Models
 
         public object GetISASENDERID(ServiceType Type, string partner, string division, string region)
         {
+            partner = string.IsNullOrEmpty(partner) ? string.Empty : partner;
+            division = string.IsNullOrEmpty(division) ? string.Empty : division;
+            region = string.IsNullOrEmpty(region) ? string.Empty : region;
             HttpResponseMessage result;
             IEnumerable<string> resultdb = QUERYREFDB()
                 .Where(x => x.PARTNER.Trim().ToUpper() == partner.Trim().ToUpper() 
@@ -110,6 +113,9 @@ namespace B2BService.Models
 
         public object GetISARECEIVERID(ServiceType Type, string partner, string division, string region)
         {
+            partner = string.IsNullOrEmpty(partner) ? string.Empty : partner;
+            division = string.IsNullOrEmpty(division) ? string.Empty : division;
+            region = string.IsNullOrEmpty(region) ? string.Empty : region;
             HttpResponseMessage result;
             IEnumerable<string> resultdb = QUERYREFDB()
                 .Where(x => x.PARTNER.Trim().ToUpper() == partner.Trim().ToUpper()

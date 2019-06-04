@@ -56,12 +56,21 @@ namespace B2BService.Controllers
         }
 
         public ActionResult MT_DB(string piServer, 
-            string partner, string division, string region,
+            string areapartner, string areadivision, string arearegion,
             string docnum, string msgid, string parent, string controlnum, string idoc,
-            string edimsgtype, string chlMsgId, decimal? direction, decimal? ddlStatus,
-            string gssenderid, string gsreceiverid,
-            string isasenderid, string isareceiverid, DateTime? cdtFrom, DateTime? cdtEnd, string keyWordSearch)
+            string areaedimsgtype, string chlMsgId, decimal? areadirection, decimal? ddlStatus,
+            string areagssenderid, string gsreceiverid,
+            string areaisasenderid, string areaisareceiverid, DateTime? cdtFrom, DateTime? cdtEnd, string keyWordSearch)
         {
+            var partner = areapartner;
+            var division = areadivision;
+            var region = arearegion;
+            var edimsgtype = areaedimsgtype;
+            var direction = areadirection;
+            var gssenderid = areagssenderid;
+            var isasenderid = areaisasenderid;
+            var isareceiverid = areaisareceiverid;
+
             MT_DB mtdb = new Models.MT_DB();
             //mtdb.AS2PARTNER = (string.IsNullOrEmpty(partner)) ? string.Empty : partner.ToUpper();
             //等對應表修正了，再加入上列查詢條件。

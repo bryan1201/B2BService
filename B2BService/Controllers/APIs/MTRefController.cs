@@ -71,7 +71,7 @@ namespace B2BService.Controllers.APIs
         }
 
         //http://localhost:52010/B2BService/api/MTRef/GetDivisions?partner=DELL&optradio=PIQServer
-        public HttpResponseMessage GetDivisions(string partner, string optradio)
+        public HttpResponseMessage GetDivision(string partner, string optradio)
         {
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> divisions = ((IEnumerable<string>)imtref.GetDIVISION(_type, partner)).ToList();
@@ -79,7 +79,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
-        public HttpResponseMessage GetRegions(string partner, string division, string optradio)
+        public HttpResponseMessage GetRegion(string partner, string division, string optradio)
         {
             //http://localhost:52010/B2BService/api/MTRef/GetRegions?partner=DELL&division=Server&optradio=PIQServer
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
@@ -88,7 +88,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
-        public HttpResponseMessage GetISASenderIDs(string partner, string division, string region, string optradio)
+        public HttpResponseMessage GetISASenderID(string partner, string division, string region, string optradio)
         {
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> isasenderids = ((IEnumerable<string>)imtref.GetISASENDERID(_type, partner, division, region)).ToList();
@@ -96,7 +96,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
-        public HttpResponseMessage GetISAReceiverIDs(string partner, string division, string region, string optradio)
+        public HttpResponseMessage GetISAReceiverID(string partner, string division, string region, string optradio)
         {
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> isasreceiverids = ((IEnumerable<string>)imtref.GetISARECEIVERID(_type, partner, division, region)).ToList();
@@ -104,7 +104,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
-        public HttpResponseMessage GetGSSenderIDs(string partner, string division, string region, string optradio)
+        public HttpResponseMessage GetGSSenderID(string partner, string division, string region, string optradio)
         {
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> gssenderids = ((IEnumerable<string>)imtref.GetGSSENDERID(_type, partner, division, region)).ToList();
@@ -112,7 +112,7 @@ namespace B2BService.Controllers.APIs
             return result;
         }
 
-        public HttpResponseMessage GetEDIMsgTypes(string partner, string division, string region, string optradio)
+        public HttpResponseMessage GetEDIMsgType(string partner, string division, string region, string optradio)
         {
             IMTRef imtref = DataAccess.CreateMTREFDB(optradio);
             IList<string> edimsgtypes = ((IEnumerable<string>)imtref.GetEDIMSGTYPE(_type, partner, division, region)).ToList();
